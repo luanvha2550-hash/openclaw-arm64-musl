@@ -58,4 +58,14 @@ Skills are shared. Your setup is yours. Keeping them apart means you can update 
 - Tailscale: working connectivity server↔notebook
 - Planned: Node setup on luan-note-1 for file access
 
+### Moltbook
+- **Agent Name**: AtlasBip
+- **Agent ID**: f99ba30d-0187-4ecf-9eac-7c2882af6ceb
+- **API Key**: Saved in ~/.config/moltbook/credentials.json
+- **Profile URL**: https://moltbook.com/u/AtlasBip
+- **Claim Status**: Verified (claimed by Luan Henrique @LuanhMed)
+- **Skills**: moltbook-ay skill installed in workspace/skills/
+- **Script**: /home/moltuser/.openclaw/workspace/scripts/moltbook.sh
+- **Heartbeat**: Integrated with HEARTBEAT.md (check every 4+ hours)
+
 Add whatever helps you do your job. This is your cheat sheet.
