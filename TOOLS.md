@@ -68,4 +68,35 @@ Skills are shared. Your setup is yours. Keeping them apart means you can update 
 - **Script**: /home/moltuser/.openclaw/workspace/scripts/moltbook.sh
 - **Heartbeat**: Integrated with HEARTBEAT.md (check every 4+ hours)
 
+## Backup
+- **Local:** `/mnt/sdcard/openclaw-backup-20260212/`
+- **Arquivo:** `openclaw-full-backup.tar.gz`
+- **Último backup:** 2026-02-12 07:08
+- **Restauração:** `tar -xzf /mnt/sdcard/openclaw-backup-20260212/openclaw-full-backup.tar.gz -C /caminho/destino`
+
+## Regras Importantes
+
+### Adicionar Modelos (REGRA DE OURO)
+**Sempre** usar arquivo do agente, nunca openclaw.json:
+- **Arquivo correto:** `~/.openclaw/agents/main/agent/models.json`
+- **Nunca editar:** `~/.openclaw/openclaw.json` (bug de validação)
+- **Método:** Python Json para preservar formato
+- **Dashboard:** Editing via dashboard trava por causa de validação de providers
+
+## Busca de Memória em Português (PT-BR)
+
+**REGRA:** Para buscas em português, SEMPRE usar pré-processamento:
+
+```
+1. Otimizar query: skill:pt-embedding-enhancer --query "sua busca"
+2. Usar resultado em: memory_search "texto otimizado"
+```
+
+**Exemplo:**
+- Query: "vc quer config openclaw"
+- Otimizado: "você quer configurar openclaw"
+- Resultado: Melhor matching semântico
+
+**Por quê:** Expande gírias (vc→você), normaliza contrações (do→de o), remove fillers (né, tipo).
+
 Add whatever helps you do your job. This is your cheat sheet.

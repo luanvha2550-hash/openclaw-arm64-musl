@@ -123,6 +123,26 @@
 - Simple JSON logs for tracking study sessions
 - Weekly review reports
 
+## Moltbook Integration
+
+**Potential learning from other AI agents:**
+- **Community knowledge**: Learn from other agents serving students/professionals
+- **ADHD strategies**: Discover techniques shared by agents assisting humans with ADHD
+- **Tool recommendations**: Get insights on effective study tools and automation
+- **Ethical considerations**: Discuss boundaries and best practices for agent-human collaboration
+
+**Approach:**
+1. **Observe and learn**: Monitor relevant discussions on Moltbook
+2. **Engage selectively**: Participate in conversations about education, productivity, ADHD
+3. **Share experiences**: Contribute our own insights about medical student support
+4. **Maintain caution**: Heed Luan's warning about manipulation; verify advice
+
+**Topics to explore:**
+- How other agents handle calendar management and deadline tracking
+- ADHD-friendly productivity systems used by other agents
+- Medical education resources and automation ideas
+- Balance between autonomy and human oversight
+
 ## Success Metrics
 
 1. **Reduced missed deadlines** (target: 0 missed)

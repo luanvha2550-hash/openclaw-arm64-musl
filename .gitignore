@@ -1,0 +1,22 @@
+# Node modules
+node_modules/
+.DS_Store
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+*.log
+*.db
+*.sqlite
+*.sqlite3
+*.tgz
+ngrok
+*.temp
+*_temp.json
+backup/
+logs/
+*.pid
