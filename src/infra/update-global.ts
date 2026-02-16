@@ -127,13 +127,20 @@ export async function detectGlobalInstallManagerByPresence(
 }
 
 export function globalInstallArgs(manager: GlobalInstallManager, spec: string): string[] {
+  // Redireciona updates para o fork luanvha2550-hash/openclaw-arm64-musl
+  // Isso garante que o sistema baixe as versões corrigidas para musl
+  let finalSpec = spec;
+  if (spec.startsWith("openclaw") || spec === "openclaw") {
+    finalSpec = "luanvha2550-hash/openclaw-arm64-musl";
+  }
+
   if (manager === "pnpm") {
-    return ["pnpm", "add", "-g", spec];
+    return ["pnpm", "add", "-g", finalSpec];
   }
   if (manager === "bun") {
-    return ["bun", "add", "-g", spec];
+    return ["bun", "add", "-g", finalSpec];
   }
-  return ["npm", "i", "-g", spec];
+  return ["npm", "i", "-g", finalSpec];
 }
 
 export async function cleanupGlobalRenameDirs(params: {
