@@ -1,0 +1,32 @@
+{
+  "name": "openclaw-arm64-musl",
+  "version": "2026.2.2-arm64-musl",
+  "description": "OpenClaw fork optimized for ARM64 musl (PostmarketOS) with prebuilt binaries",
+  "main": "bin/index.js",
+  "scripts": {
+    "preinstall": "bash scripts/preinstall-fix.sh || true",
+    "install": "bash scripts/install-with-prebuilt.sh || npm install --ignore-scripts",
+    "postinstall": "bash scripts/postinstall-verify.sh || true"
+  },
+  "bin": {
+    "openclaw": "./bin/openclaw-cli.js"
+  },
+  "keywords": [
+    "openclaw",
+    "arm64",
+    "musl",
+    "postmarketos",
+    "llama",
+    "local-llm"
+  ],
+  "author": "luanvha2550-hash",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luanvha2550-hash/openclaw-arm64-musl.git"
+  },
+  "bugs": {
+    "url": "https://github.com/luanvha2550-hash/openclaw-arm64-musl/issues"
+  },
+  "homepage": "https://github.com/luanvha2550-hash/openclaw-arm64-musl#readme"
+}
