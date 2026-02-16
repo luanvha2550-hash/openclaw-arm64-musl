@@ -1,0 +1,185 @@
+╔══════════════════════════════════════════════════════════════════════════╗
+║                                                                          ║
+║   🦙 LLAMA NATIVE COMPILER - SEM DESINSTALAÇÃO                 ║
+║                                                                          ║
+║   RECOMPILA node-llama-cpp **SEM** desinstalar OpenClaw!                ║
+║                                                                          ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+══════════════════════════════════════════════════════════════════════════
+📋 MÉTODO 1: RECOMPILAR node-llama-cpp DENTRO do OpenClaw instalado
+══════════════════════════════════════════════════════════════════════════
+
+bash << 'EOF'
+set -e
+echo "╔════════════════════════════════════════════════════════╗"
+echo "║   🦙 RECOMPILAR node-llama-cpp (mantém OpenClaw)       ║"
+echo "╚════════════════════════════════════════════════════════╝"
+echo ""
+
+[ "$(uname -m)" != "aarch64" ] && { echo "❌ Execute no ZenFone (ARM64)!"; exit 1; }
+
+# Encontra node-llama-cpp instalado
+NODE_LLAMA="/usr/local/lib/node_modules/openclaw/node_modules/node-llama-cpp"
+
+if [ ! -d "$NODE_LLAMA" ]; then
+    echo "❌ node-llama-cpp não encontrado em $NODE_LLAMA"
+    echo "   Verifique se OpenClaw está instalado: npm list -g --depth=0 | grep openclaw"
+    exit 1
+fi
+
+echo "✅ node-llama-cpp encontrado"
+echo "   Caminho: $NODE_LLAMA"
+echo ""
+
+cd "$NODE_LLAMA"
+
+# Limpa build anterior
+echo "[1/4] Limpando build anterior..."
+npm run clean 2>/dev/null || rm -rf build
+echo "✅ Limpo"
+echo ""
+
+# Compila
+echo "[2/4] Recompilando NATIVO..."
+echo "⏱️  15-30 min | CPU: ALTA | RAM: ALTA"
+echo ""
+
+if timeout 1800 npm rebuild 2>&1 | tee /tmp/rebuild-llama.log; then
+    echo ""
+    echo "✅ SUCESSO!"
+else
+    EXIT=$?
+    if [ $EXIT -eq 124 ]; then
+        echo "❌ TIMEOUT"
+        tail -50 /tmp/rebuild-llama.log
+        exit 1
+    else
+        echo "❌ ERRO (exit $EXIT)"
+        tail -50 /tmp/rebuild-llama.log
+        exit 1
+    fi
+fi
+
+echo ""
+echo "[3/4] Extraindo binários..."
+mkdir -p /tmp/llama-binaries
+
+# Copiar Llama.node
+find "$NODE_LLAMA" -name "Llama.node" -type f | head -1 | xargs -I{} cp {} /tmp/llama-binaries/ 2>/dev/null
+if [ -f /tmp/llama-binaries/Llama.node ]; then
+    echo "✅ Llama.node copiado"
+    file /tmp/llama-binaries/Llama.node
+else
+    echo "❌ Llama.node NÃO encontrado!"
+    echo "   Procurando..."
+    find "$NODE_LLAMA" -name "*.node" | head -10
+fi
+
+# Copiar libs
+find "$NODE_LLAMA" -name "*.so" -type f | xargs -I{} cp {} /tmp/llama-binaries/ 2>/dev/null
+LIBS=$(find /tmp/llama-binaries -name "*.so" 2>/dev/null | wc -l)
+echo "✅ $LIBS libs copiadas"
+
+echo ""
+echo "[4/4] Empacotando..."
+cd /tmp
+tar czf llama-binaries-recompile.tar.gz llama-binaries/
+SIZE=$(du -h llama-binaries-recompile.tar.gz | cut -f1)
+
+echo ""
+echo "╔════════════════════════════════════════════════════════╗"
+echo "║   ✅ RECOMPILAÇÃO CONCLUÍDA! ✅                        ║"
+echo "║   OpenClaw instalado permanece INTACTO!              ║"
+echo "╚════════════════════════════════════════════════════════╝"
+echo ""
+echo "📦 Binários: /tmp/llama-binaries/"
+ls -lh /tmp/llama-binaries/
+echo ""
+echo "📦 ZIP: /tmp/llama-binaries-recompile.tar.gz ($SIZE)"
+echo ""
+echo "✨ OpenClaw continua instalado! ✨"
+EOF
+
+══════════════════════════════════════════════════════════════════════════
+📋 MÉTODO 2: CLONAR e COMPILAR separadamente (mais seguro)
+══════════════════════════════════════════════════════════════════════════
+
+bash << 'EOF'
+set -e
+echo "╔════════════════════════════════════════════════════════╗"
+echo "║   🦙 CLONAR e COMPILAR node-llama-cpp (separado)       ║"
+echo "╚════════════════════════════════════════════════════════╝"
+echo ""
+
+cd /tmp
+
+echo "[1/4] Clonando node-llama-cpp..."
+rm -rf node-llama-cpp-compile
+git clone --depth 1 https://github.com/withcatai/node-llama-cpp.git node-llama-cpp-compile
+cd node-llama-cpp-compile
+echo "✅ Clonado"
+echo ""
+
+echo "[2/4] Compilando NATIVO..."
+echo "⏱️  15-30 min | CPU: ALTA | RAM: ALTA"
+echo ""
+
+npm config set script-shell /bin/sh
+
+if timeout 1800 npm install 2>&1 | tee /tmp/compile-llama-separado.log; then
+    echo ""
+    echo "✅ SUCESSO!"
+else
+    EXIT=$?
+    if [ $EXIT -eq 124 ]; then
+        echo "❌ TIMEOUT"
+        tail -50 /tmp/compile-llama-separado.log
+        exit 1
+    else
+        echo "❌ ERRO (exit $EXIT)"
+        tail -50 /tmp/compile-llama-separado.log
+        exit 1
+    fi
+fi
+
+echo ""
+echo "[3/4] Extraindo binários..."
+mkdir -p /tmp/llama-binaries-separado
+
+# Copiar tudo relevante
+cp -r dist /tmp/llama-binaries-separado/ 2>/dev/null || true
+cp -r build /tmp/llama-binaries-separado/ 2>/dev/null || true
+cp -r llama/localBuilds /tmp/llama-binaries-separado/ 2>/dev/null || true
+
+# Copiar Llama.node específico
+find . -name "Llama.node" -type f | head -1 | xargs -I{} cp {} /tmp/llama-binaries-separado/ 2>/dev/null
+echo "✅ Binários copiados"
+
+echo ""
+echo "[4/4] Empacotando..."
+cd /tmp
+tar czf llama-binaries-separado.tar.gz llama-binaries-separado/
+SIZE=$(du -h llama-binaries-separado.tar.gz | cut -f1)
+
+echo ""
+echo "╔════════════════════════════════════════════════════════╗"
+echo "║   ✅ COMPILAÇÃO CONCLUÍDA! ✅                          ║"
+echo "╚════════════════════════════════════════════════════════╝"
+echo ""
+echo "📦 Binários: /tmp/llama-binaries-separado/"
+echo "📦 ZIP: /tmp/llama-binaries-separado.tar.gz ($SIZE)"
+echo ""
+echo "✨ OpenClaw INTACTO! Compilação separada! ✨"
+EOF
+
+══════════════════════════════════════════════════════════════════════════
+🎯 RECOMENDAÇÃO:
+══════════════════════════════════════════════════════════════════════════
+
+✅ **MÉTODO 2 (separado)** é mais seguro:
+   - NÃO interfere com OpenClaw instalado
+   - Tenta limpar do zero
+   - Garante binários puros
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

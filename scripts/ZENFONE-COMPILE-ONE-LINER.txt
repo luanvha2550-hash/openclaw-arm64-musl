@@ -1,0 +1,131 @@
+╔══════════════════════════════════════════════════════════════════════════╗
+║                                                                          ║
+║   🦙 LLAMA NATIVE COMPILER - ARM64 musl (One-Liner)                      ║
+║                                                                          ║
+║   Execute este comando DIRETAMENTE no terminal SSH do ZenFone           ║
+║                                                                          ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+══════════════════════════════════════════════════════════════════════════
+📋 COMANDO COMPLETO (COPIE E COLE NO TERMINAL SSH DO ZENFONE):
+══════════════════════════════════════════════════════════════════════════
+
+bash << 'EOF'
+set -e
+echo "╔════════════════════════════════════════════════════════╗"
+echo "║   🦙 LLAMA NATIVE COMPILER - ARM64 musl          ║"
+echo "╚════════════════════════════════════════════════════════╝"
+echo ""
+echo "Iniciando: $(date '+%Y-%m-%d %H:%M:%S')"
+echo ""
+
+[ "$(uname -m)" != "aarch64" ] && { echo "❌ ERRO: Execute no ZenFone (ARM64)!"; exit 1; }
+echo "✅ ARM64 confirmado"
+echo ""
+
+echo "[1/4] NPM Shell Fix..."
+npm config set script-shell /bin/sh
+
+echo "[2/4] Limpando anterior..."
+npm uninstall -g openclaw || true
+sudo rm -rf /usr/local/lib/node_modules/openclaw
+
+echo "[3/4] Compilando NATIVO (node-llama-cpp)..."
+echo "⏱️  Tempo: 15-30 min"
+echo "⚡ CPU: ALTA | 💾 RAM: ALTA"
+echo ""
+if timeout 1800 npm i -g openclaw@2026.2.2 > /tmp/npm-build.log 2>&1; then
+    echo "✅ SUCESSO!"
+else
+    EXIT=$?
+    if [ $EXIT -eq 124 ]; then
+        echo "❌ TIMEOUT (mais de 30 min)"
+        echo "📄 Log: tail -100 /tmp/npm-build.log"
+        exit 1
+    else
+        echo "❌ ERRO (exit $EXIT)"
+        echo "📄 Últimas linhas do log:"
+        tail -50 /tmp/npm-build.log
+        exit 1
+    fi
+fi
+
+echo ""
+echo "[4/4] Extraindo binários..."
+mkdir -p /tmp/llama-binaries
+
+NODE_LLAMA=/usr/local/lib/node_modules/openclaw/node_modules/node-llama-cpp
+
+find "$NODE_LLAMA" -name "Llama.node" | head -1 | xargs -I{} cp {} /tmp/llama-binaries/ 2>/dev/null && echo "✅ Llama.node copiado"
+
+find "$NODE_LLAMA" -name "*.so" | xargs -I{} cp {} /tmp/llama-binaries/ 2>/dev/null
+LIBS=$(find /tmp/llama-binaries -name "*.so" 2>/dev/null | wc -l)
+echo "✅ $LIBS bibliotecas copiadas"
+
+echo ""
+echo "╔════════════════════════════════════════════════════════╗"
+echo "║   ✅ COMPILAÇÃO CONCLUÍDA! ✅                         ║"
+echo "╚════════════════════════════════════════════════════════╝"
+echo ""
+echo "📦 Binários em /tmp/llama-binaries/"
+ls -lh /tmp/llama-binaries/
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+cd /tmp
+tar czf llama-binaries-nativo.tar.gz llama-binaries/
+SIZE=$(du -h llama-binaries-nativo.tar.gz | cut -f1)
+echo "📦 Arquivo: /tmp/llama-binaries-nativo.tar.gz ($SIZE)"
+echo ""
+echo "📤 PARA ENVIAR AO PC:"
+echo "   scp /tmp/llama-binaries-nativo.tar.gz luan@192.168.x.x:/path/to/"
+echo "" 
+echo "Ou via Telegram: envie o arquivo tar"
+echo ""
+echo "FIM: $(date '+%Y-%m-%d %H:%M:%S')"
+EOF
+
+══════════════════════════════════════════════════════════════════════════
+⚠️  AVISOS:
+══════════════════════════════════════════════════════════════════════════
+
+1. Execute DIRETAMENTE no terminal SSH do ZenFone (NÃO no Windows)
+2. NÃO FECHE o terminal enquanto compila!
+3. Tempo: 15-30 minutos
+4. Verifique RAM livre antes: free -h
+
+══════════════════════════════════════════════════════════════════════════
+🔧 VERIFICAR PROGRESSO (outro terminal SSH):
+══════════════════════════════════════════════════════════════════════════
+
+# Verificar se está rodando
+ps aux | grep npm
+
+# Verificar RAM/CPU
+top -bn1 | head -15
+
+# Verificar log
+tail -f /tmp/npm-build.log
+
+══════════════════════════════════════════════════════════════════════════
+🎯 RESULTADO ESPERADO:
+══════════════════════════════════════════════════════════════════════════
+
+/tmp/llama-binaries/
+  ├── Llama.node         (binário ARM64 musl)
+  ├── libllama.so*       (libs compiladas)
+  ├── libggml.so*
+  └── libggml-base.so*
+
+Arquivo: /tmp/llama-binaries-nativo.tar.gz (6-8 MB)
+
+══════════════════════════════════════════════════════════════════════════
+🚀 PRÓXIMOS PASSOS:
+══════════════════════════════════════════════════════════════════════════
+
+1. Transferir tar.gz para seu PC
+2. Extrair: tar xzf llama-binaries-nativo.tar.gz
+3. Copiar para fork do Luan: prebuilt/linux-arm64-musl/
+4. Commit e testar no ZenFone
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
